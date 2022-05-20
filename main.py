@@ -5,13 +5,14 @@ from gurobipy import Model, GRB, quicksum
 import random
 
 #Cantidad de días
-T = 30 
+T = 28 
 # Cantidad de productos
 P = 100 
 
 
 # Rangos
-T_ = range(1, T + 1)
+T_ = range(0, T + 1)
+E_ = range(1, T + 1)
 P_ = range(1, P + 1)
 Q_ = ["R", "C", "A"]
 
@@ -49,15 +50,17 @@ model = Model()
 #### Variables
 
 # Cantidad comprada del producto p en el día t que vence en e días
-
+c = model.addVars(P_, T_, E_)
+# Si se decide comprar el producto p en el dia t
+C = model.addVars(P_, T_)
 # Cantidad vendida del producto p en el dıa t que vencıa en e dıas.
-
+s = model.addVars(P_,T_,E_)
 # Cantidad en el inventario del producto p al final del dıa t que vence en e dıas.
-
+i = model.addVars(P_,T_,E_)
 # Cantidad de p desechada al final del dıa t, porque vence en t + 1.
-
+w = model.addVars(P_, T_)
 # Presupuesto del supermercado al final del dıa t, despues de haber pagado el bodegaje para la noche.
-
+B = model.addVars(T_)
 
 #### Función Objetivo
 
