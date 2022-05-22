@@ -64,46 +64,78 @@ B = model.addVars(T_)
 
 #### Función Objetivo
 
+objetivo = sum(sum(w[p,t] for p in P_) for t in T_)
+
 #### Restricciones
 
 #R1 
-
+model.addConstrs(B[t] == B[t-1] + sum(sum(s[p,t,e]*z[p] for e in T_) for p in P_) -\
+    sum(sum(c[p,t,e]*n[p,t] for e in T_) for p in P_) -\
+    sum(w[p,t]*u[p] for p in P_) -\
+    sum(sum(i[p,t,e] * b[p,t] for e in range(2, T + 1)) for p in P_) -\
+    sum(C[p,t]*F[p,t] for p in P_) for t in range(2, T + 1))
 #R2
+model.addConst(B[1] == P*R) 
+#Creo que era así cuando no dependía de subínices, REVISAR
 
 #R3
+model.addConstrs(c[p,t,e] <= C[p,t]*M for t in T_ for e in T_ for p in P)
+#¿Cómo ponemos que M >> 0? ¿o eso es implícito?
 
 #R4 
+model.addConstr(minc[p]*C[p,t] <= c[p,t,e] for t in T_ for e in T_ for p in P_)
 
 #R5
- 
+model.addConstrs(i[p,0,e] for e in T_ for p in P_)
+
 #R6 
+model.addConstrs(i[p,t,e] == i[p, t-1, e+1] + c[p,t,e] -s[p,t,e] for t in T_ for e in range(1, T) for p in P_)
 
 #R7
+model.addConstrs(i[p,t,T] == c[p,t,T] - s[p,t,T] for t in T_ for p in P_)
 
 #R8 
+model.addConstrs(c[p,t,e] == 0 for t in T_ for p in P_ for e in T_ )
+#e != exp_p ¿Cómo lo pongo?
 
 #R9 
+model.addConstrs(sum(i[p,t-1,e] + c[p,t,e] for e in range(2, T+1)) >= d[p,t] for t in T_ for p in P_)
 
-#R10 
+#R10
+model.addConstrs(sum(sum(i[p,t,e]*v[p] for e in range(2,T+1)) for p in P_) <= V[q] for q in Q_ for t in T_) 
 
 #R11 
+model.addConstrs(sum(sum(c[p,t,e]*v[p] for e in T_) for p in P_) <= maxc[p] for p in P_ for t in T_)
 
 #R12 
+model.addConstrs(sum(s[p,t,e] for e in T_) == d[p,t] for p in P_ for t in T_)
 
 #R13 
+model.addConstrs(w[p,t] == i[p,t,1] for p in P_ for t in T_)
 
 #R14 
+model.addConstrs(sum(C[p,t] for t in range(1 + N*7, 7 + N*7 + 1)) <= 1 for p in P_ for N in range(0, T/7))
 
-#R15 
+#R15
+model.addConstrs(c[p,t,e] >= 0 for t in T_ for p in P_ for e in T_) 
 
-#R16 
+#R16
+model.addConstrs(s[p,t,e] >= 0 for t in T_ for p in P_ for e in T_)  
 
-#R17 
+#R17
+model.addConstrs(i[p,t,e] >= 0 for t in T_ for p in P_ for e in T_)  
 
 #R18 
+model.addConstrs(w[p,t] >= 0 for t in T_ for p in P_) 
 
- 
+#R19
+model.addConstrs(B[t] >= 0 for t in T_) 
 
+#20
+#¿No es neceasario la naturaleza de las variables binarias o no?
 
+model.setObjective(objetivo, GRB.MINIMIZE)
+
+model.optimize()
 
 #### Imprimir resultados
