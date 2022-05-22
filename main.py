@@ -83,10 +83,10 @@ model.addConstrs(c[p,t,e] <= C[p,t]*M for t in T_ for e in T_ for p in P)
 #¿Cómo ponemos que M >> 0? ¿o eso es implícito?
 
 #R4 
-model.addConstr(minc[p]*C[p,t] <= c[p,t,e] for t in T_ for e in T_ for p in P_)
+model.addConstr(min[c[p]]*C[p,t] <= c[p,t,e] for t in T_ for e in T_ for p in P_)
 
 #R5
-model.addConstrs(i[p,0,e] for e in T_ for p in P_)
+model.addConstrs(i[p,0,e] == 0 for e in T_ for p in P_)
 
 #R6 
 model.addConstrs(i[p,t,e] == i[p, t-1, e+1] + c[p,t,e] -s[p,t,e] for t in T_ for e in range(1, T) for p in P_)
@@ -105,7 +105,7 @@ model.addConstrs(sum(i[p,t-1,e] + c[p,t,e] for e in range(2, T+1)) >= d[p,t] for
 model.addConstrs(sum(sum(i[p,t,e]*v[p] for e in range(2,T+1)) for p in P_) <= V[q] for q in Q_ for t in T_) 
 
 #R11 
-model.addConstrs(sum(sum(c[p,t,e]*v[p] for e in T_) for p in P_) <= maxc[p] for p in P_ for t in T_)
+model.addConstrs(sum(sum(c[p,t,e]*v[p] for e in T_) for p in P_) <= max[c[p]] for p in P_ for t in T_)
 
 #R12 
 model.addConstrs(sum(s[p,t,e] for e in T_) == d[p,t] for p in P_ for t in T_)
