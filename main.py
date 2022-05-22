@@ -2,6 +2,7 @@
 #librerías externas. Hacer esto una vez que se esté seguro que los resultados están buenos.
 
 from gurobipy import Model, GRB, quicksum
+from datos.creacion_datos import F, n, b, d, v, minc, maxc, z, exp, u, PR, V
 import random
 
 #Cantidad de días
@@ -11,11 +12,10 @@ P = 100
 
 
 # Rangos
-T_ = range(0, T + 1)
+T_ = range(1, T + 1)
 E_ = range(1, T + 1)
 P_ = range(1, P + 1)
 Q_ = ["R", "C", "A"]
-
 # Parametros:
 
 # Costo Fijo por hacer un pedido de p el día t
@@ -52,11 +52,11 @@ model = Model()
 # Cantidad comprada del producto p en el día t que vence en e días
 c = model.addVars(P_, T_, E_)
 # Si se decide comprar el producto p en el dia t
-C = model.addVars(P_, T_)
+C = model.addVars(P_, T_, vtype = GRB.BINARY)
 # Cantidad vendida del producto p en el dıa t que vencıa en e dıas.
 s = model.addVars(P_,T_,E_)
 # Cantidad en el inventario del producto p al final del dıa t que vence en e dıas.
-i = model.addVars(P_,T_,E_)
+i = model.addVars(P_,range(0, T + 1),E_)
 # Cantidad de p desechada al final del dıa t, porque vence en t + 1.
 w = model.addVars(P_, T_)
 # Presupuesto del supermercado al final del dıa t, despues de haber pagado el bodegaje para la noche.
@@ -69,64 +69,89 @@ objetivo = sum(sum(w[p,t] for p in P_) for t in T_)
 #### Restricciones
 
 #R1 
-model.addConstrs(B[t] == B[t-1] + sum(sum(s[p,t,e]*z[p] for e in T_) for p in P_) -\
-    sum(sum(c[p,t,e]*n[p,t] for e in T_) for p in P_) -\
-    sum(w[p,t]*u[p] for p in P_) -\
-    sum(sum(i[p,t,e] * b[p,t] for e in range(2, T + 1)) for p in P_) -\
-    sum(C[p,t]*F[p,t] for p in P_) for t in range(2, T + 1))
+model.addConstrs(B[t] == B[t-1] +   sum(sum(s[p,t,e]*z[p] for e in E_) for p in P_) -\
+                                    sum(sum(c[p,t,e]*n[p,t] for e in E_) for p in P_) -\
+                                    sum(w[p,t]*u[p] for p in P_) -\
+                                    sum(sum(i[p,t,e] * b[p,t] for e in range(2, T + 1)) for p in P_) -\
+                                    sum(C[p,t]*F[p,t] for p in P_) 
+                                    for t in range(2, T + 1))
 #R2
-model.addConst(B[1] == P*R) 
+model.addConstr(B[1] == PR) 
 #Creo que era así cuando no dependía de subínices, REVISAR
 
 #R3
-model.addConstrs(c[p,t,e] <= C[p,t]*M for t in T_ for e in T_ for p in P)
+M = 10000000
+model.addConstrs(c[p,t,e] <= C[p,t] * M for t in T_ 
+                                        for e in E_ 
+                                        for p in P_)
 #¿Cómo ponemos que M >> 0? ¿o eso es implícito?
 
 #R4 
-model.addConstr(minc[p]*C[p,t] <= c[p,t,e] for t in T_ for e in T_ for p in P_)
+model.addConstrs(minc[p]*C[p,t] <= c[p,t,e]  for t in T_ 
+                                            for e in E_ 
+                                            for p in P_)
 
 #R5
-model.addConstrs(i[p,0,e] for e in T_ for p in P_)
+model.addConstrs(i[p,0,e] == 0  for e in E_ 
+                                for p in P_)
 
 #R6 
-model.addConstrs(i[p,t,e] == i[p, t-1, e+1] + c[p,t,e] -s[p,t,e] for t in T_ for e in range(1, T) for p in P_)
+model.addConstrs(i[p,t,e] == i[p, t-1, e+1] + c[p,t,e] - s[p,t,e]   for t in range(1, T + 1) 
+                                                                    for e in range(1, T) 
+                                                                    for p in P_)
 
 #R7
-model.addConstrs(i[p,t,T] == c[p,t,T] - s[p,t,T] for t in T_ for p in P_)
+model.addConstrs(i[p,t,T] == c[p,t,T] - s[p,t,T]    for t in T_ 
+                                                    for p in P_)
 
 #R8 
-model.addConstrs(c[p,t,e] == 0 for t in T_ for p in P_ for e in T_ )
+model.addConstrs(c[p,t,e] == 0  for t in T_ 
+                                for p in P_ 
+                                for e in E_ )
 #e != exp_p ¿Cómo lo pongo?
 
 #R9 
-model.addConstrs(sum(i[p,t-1,e] + c[p,t,e] for e in range(2, T+1)) >= d[p,t] for t in T_ for p in P_)
+model.addConstrs(sum(i[p,t-1,e] + c[p,t,e] for e in range(2, T+1)) >= d[p,t]    for t in T_ 
+                                                                                for p in P_)
 
 #R10
-model.addConstrs(sum(sum(i[p,t,e]*v[p] for e in range(2,T+1)) for p in P_) <= V[q] for q in Q_ for t in T_) 
+model.addConstrs(sum(sum(i[p,t,e]*v[p] for e in range(2,T+1)) for p in P_) <= V[q]  for q in Q_ 
+                                                                                    for t in T_) 
 
 #R11 
-model.addConstrs(sum(sum(c[p,t,e]*v[p] for e in T_) for p in P_) <= maxc[p] for p in P_ for t in T_)
+model.addConstrs(sum(sum(c[p,t,e]*v[p] for e in E_) for p in P_) <= maxc[p]     for p in P_ 
+                                                                                for t in T_)
 
 #R12 
-model.addConstrs(sum(s[p,t,e] for e in T_) == d[p,t] for p in P_ for t in T_)
+model.addConstrs(sum(s[p,t,e] for e in E_) == d[p,t]    for p in P_ 
+                                                        for t in T_)
 
 #R13 
-model.addConstrs(w[p,t] == i[p,t,1] for p in P_ for t in T_)
+model.addConstrs(w[p,t] == i[p,t,1] for p in P_ 
+                                    for t in T_)
 
 #R14 
-model.addConstrs(sum(C[p,t] for t in range(1 + N*7, 7 + N*7 + 1)) <= 1 for p in P_ for N in range(0, T/7))
+model.addConstrs(sum(C[p,t] for t in range(1 + N*7, 7 + N*7 + 1)) <= 1  for p in P_ 
+                                                                        for N in range(0, int(T/7)))
 
 #R15
-model.addConstrs(c[p,t,e] >= 0 for t in T_ for p in P_ for e in T_) 
+model.addConstrs(c[p,t,e] >= 0  for t in T_ 
+                                for p in P_ 
+                                for e in E_) 
 
 #R16
-model.addConstrs(s[p,t,e] >= 0 for t in T_ for p in P_ for e in T_)  
+model.addConstrs(s[p,t,e] >= 0  for t in T_ 
+                                for p in P_ 
+                                for e in E_)  
 
 #R17
-model.addConstrs(i[p,t,e] >= 0 for t in T_ for p in P_ for e in T_)  
+model.addConstrs(i[p,t,e] >= 0  for t in T_ 
+                                for p in P_ 
+                                for e in E_)  
 
 #R18 
-model.addConstrs(w[p,t] >= 0 for t in T_ for p in P_) 
+model.addConstrs(w[p,t] >= 0    for t in T_ 
+                                for p in P_) 
 
 #R19
 model.addConstrs(B[t] >= 0 for t in T_) 
