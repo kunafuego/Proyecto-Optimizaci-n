@@ -103,6 +103,7 @@ m.addConstrs(x[i,j,h,k] <= y[i,j,h,k]   for i in N_
                                         for k in K_)
 
 m.setObjective(objetivo, GRB.MAXIMIZE)
+m.setParam('TimeLimit', 60)
 
 m.optimize()
 

@@ -107,7 +107,7 @@ model.addConstrs(i[p,t,T] == c[p,t,T] - s[p,t,T]    for t in T_
 #R8 
 model.addConstrs(c[p,t,e] == 0  for t in T_ 
                                 for p in P_ 
-                                for e in E_ )
+                                for e in E_ if not exp[p] == e)
 #e != exp_p ¿Cómo lo pongo?
 
 #R9 
