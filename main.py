@@ -162,15 +162,10 @@ model.optimize()
 #### Imprimir resultados
 print(minc[1], maxc[1],exp[1])
 print(model.ObjVal)
-m=0
-for p in P_:
-    for t in T_:
-        if p==1:
-            print(f"La demanda por el producto el dia {t} es {d[1,t]}")
-        for e in E_:
-            if p==1:
-                print(f"El inventario de {p} que vence en {e} dias el dia {t} es {i[p,t,e].x}")
-                print(f"Se compraron {c[p,t,e].x} que vencen en {e} dias, y C[p,t] es {C[p,t].x}")
-                            
-if m==0:
-    print("NNN")
+
+
+for t in T_:
+    print(f"La demanda por el producto el dia {t} es {d[1,t]}")
+    for e in E_:
+        print(f"El inventario de 1 que vence en {e} dias el dia {t} es {i[1,t,e].x}")
+        print(f"Se compraron {c[1,t,e].x} que vencen en {e} dias, y C[p,t] es {C[1,t].x}")
