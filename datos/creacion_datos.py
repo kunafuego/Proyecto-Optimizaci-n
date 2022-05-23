@@ -89,7 +89,7 @@ Este parametro indica la demanda del producto *p* en el día *t*. En este caso n
 El valor de este parametro variará entre 50 y 100 unidades diarias. No existe restricción de variación.
 """
 
-df_pt.insert(5, "d", [random.randint(50,100) for x in range(2800)])
+df_pt.insert(5, "d", [random.randint(5,10) for x in range(2800)])
 
 """## Parámetros con sufijo <sub>p</sub>"""
 
@@ -120,7 +120,7 @@ Este parámetro indica la mínima cantidad de productos de *p* que se deben pedi
 Tomará un valor aleatorio entre 300 y 500 unidades.
 """
 
-df_p.insert(3, "minc", [random.randint(300,500) for _ in range(100)])
+df_p.insert(3, "minc", [random.randint(10,20) for _ in range(100)])
 
 """### z<sub>p</sub>
 
@@ -175,7 +175,7 @@ V = {"A": random.randint(150,170), "C": random.randint(75,90), "R": random.randi
 Este parámetro indica el presupuesto inicial del supermercado, el cual será un valor entre $40.000.000 y $50.000.000.
 """
 
-PR = random.randint(40000000, 50000000)
+PR = random.randint(400000000, 500000000)
 
 """## Pasar los DataFrames a diccionarios"""
 
@@ -189,3 +189,4 @@ maxc = {p: maxc for p,maxc in zip(df_p["p"], df_p["maxc"])}
 z = {p: z for p,z in zip(df_p["p"], df_p["z"])}
 exp = {p: exp for p,exp in zip(df_p["p"], df_p["exp"])}
 u = {p: u for p,u in zip(df_p["p"], df_p["u"])}
+

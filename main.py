@@ -6,9 +6,9 @@ from datos.creacion_datos import F, n, b, d, v, minc, maxc, z, exp, u, PR, V
 import random
 
 #Cantidad de días
-T = 28 
+T = 28
 # Cantidad de productos
-P = 100 
+P = 100
 
 
 # Rangos
@@ -75,23 +75,21 @@ model.addConstrs(B[t] == B[t-1] +   sum(sum(s[p,t,e]*z[p] for e in E_) for p in 
                                     sum(sum(i[p,t,e] * b[p,t] for e in range(2, T + 1)) for p in P_) -\
                                     sum(C[p,t]*F[p,t] for p in P_) 
                                     for t in range(2, T + 1))
+
 #R2
 model.addConstr(B[1] == PR) 
-#Creo que era así cuando no dependía de subínices, REVISAR
 
 #R3
 M = 10000000
-model.addConstrs(c[p,t,e] <= C[p,t] * M for t in T_ 
-                                        for e in E_ 
-                                        for p in P_)
-#¿Cómo ponemos que M >> 0? ¿o eso es implícito?
+model.addConstrs(sum(c[p,t,e] for e in E_) <= C[p,t] * M    for t in T_ 
+                                                            for p in P_)
 
-#R4 
-model.addConstrs(minc[p]*C[p,t] <= c[p,t,e]  for t in T_ 
-                                            for e in E_ 
-                                            for p in P_)
+# R4 
+model.addConstrs(minc[p] * C[p,t] <= c[p,t,e]  for t in T_ 
+                                            for p in P_
+                                            for e in E_ if exp[p] == e) 
 
-#R5
+# R5
 model.addConstrs(i[p,0,e] == 0  for e in E_ 
                                 for p in P_)
 
@@ -107,7 +105,7 @@ model.addConstrs(i[p,t,T] == c[p,t,T] - s[p,t,T]    for t in T_
 #R8 
 model.addConstrs(c[p,t,e] == 0  for t in T_ 
                                 for p in P_ 
-                                for e in E_ if not exp[p] == e)
+                                for e in E_ if exp[p] != e)
 #e != exp_p ¿Cómo lo pongo?
 
 #R9 
@@ -131,8 +129,8 @@ model.addConstrs(w[p,t] == i[p,t,1] for p in P_
                                     for t in T_)
 
 #R14 
-model.addConstrs(sum(C[p,t] for t in range(1 + N*7, 7 + N*7 + 1)) <= 1  for p in P_ 
-                                                                        for N in range(0, int(T/7)))
+# model.addConstrs(sum(C[p,t] for t in range(1 + N*7, 7 + N*7 + 1)) <= 1  for p in P_ 
+#                                                                         for N in range(0, int(T/7)))
 
 #R15
 model.addConstrs(c[p,t,e] >= 0  for t in T_ 
@@ -156,11 +154,23 @@ model.addConstrs(w[p,t] >= 0    for t in T_
 #R19
 model.addConstrs(B[t] >= 0 for t in T_) 
 
-#20
-#¿No es neceasario la naturaleza de las variables binarias o no?
-
 model.setObjective(objetivo, GRB.MINIMIZE)
 
 model.optimize()
 
+
 #### Imprimir resultados
+print(minc[1], maxc[1],exp[1])
+print(model.ObjVal)
+m=0
+for p in P_:
+    for t in T_:
+        if p==1:
+            print(f"La demanda por el producto el dia {t} es {d[1,t]}")
+        for e in E_:
+            if p==1:
+                print(f"El inventario de {p} que vence en {e} dias el dia {t} es {i[p,t,e].x}")
+                print(f"Se compraron {c[p,t,e].x} que vencen en {e} dias, y C[p,t] es {C[p,t].x}")
+                            
+if m==0:
+    print("NNN")
