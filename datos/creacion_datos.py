@@ -117,10 +117,10 @@ df_p.insert(2, "maxc", [random.uniform(5,7.5) for _ in range(100)])
 
 Este parámetro indica la mínima cantidad de productos de *p* que se deben pedir en un pedido de *p*.
 
-Tomará un valor aleatorio entre 300 y 500 unidades.
+Tomará un valor aleatorio entre 20 y 30 unidades.
 """
 
-df_p.insert(3, "minc", [random.randint(10,20) for _ in range(100)])
+df_p.insert(3, "minc", [random.randint(20,30) for _ in range(100)])
 
 """### z<sub>p</sub>
 

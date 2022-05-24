@@ -168,4 +168,4 @@ for t in T_:
     print(f"La demanda por el producto el dia {t} es {d[1,t]}")
     for e in E_:
         print(f"El inventario de 1 que vence en {e} dias el dia {t} es {i[1,t,e].x}")
-        print(f"Se compraron {c[1,t,e].x} que vencen en {e} dias, y C[p,t] es {C[1,t].x}")
+    print(f"Se compraron {c[1,t,exp[1]].x}")
