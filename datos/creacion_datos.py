@@ -166,8 +166,8 @@ Existen tres tipos de productos *q*:
 """
 
 A = [x for x in range(1,51)]
-R = [x for x in range(51,76)]
-C = [x for x in range(76,101)]
+R = [x for x in range(51,75)]
+C = [x for x in range(75,101)]
 V = {"A": random.randint(150,170), "C": random.randint(75,90), "R": random.randint(75,90)}
 
 """### PR

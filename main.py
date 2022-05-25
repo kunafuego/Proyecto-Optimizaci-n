@@ -4,6 +4,7 @@
 from gurobipy import Model, GRB, quicksum
 from datos.creacion_datos import F, n, b, d, v, minc, maxc, z, exp, u, PR, V
 import random
+import csv
 
 #Cantidad de días
 T = 28
@@ -16,6 +17,7 @@ T_ = range(1, T + 1)
 E_ = range(1, T + 1)
 P_ = range(1, P + 1)
 Q_ = ["R", "C", "A"]
+N_ = range(0, int(T/7) - 1)
 # Parametros:
 
 # Costo Fijo por hacer un pedido de p el día t
@@ -106,7 +108,6 @@ model.addConstrs(i[p,t,T] == c[p,t,T] - s[p,t,T]    for t in T_
 model.addConstrs(c[p,t,e] == 0  for t in T_ 
                                 for p in P_ 
                                 for e in E_ if exp[p] != e)
-#e != exp_p ¿Cómo lo pongo?
 
 #R9 
 model.addConstrs(sum(i[p,t-1,e] + c[p,t,e] for e in range(2, T+1)) >= d[p,t]    for t in T_ 
@@ -129,8 +130,8 @@ model.addConstrs(w[p,t] == i[p,t,1] for p in P_
                                     for t in T_)
 
 #R14 
-# model.addConstrs(sum(C[p,t] for t in range(1 + N*7, 7 + N*7 + 1)) <= 1  for p in P_ 
-#                                                                         for N in range(0, int(T/7)))
+model.addConstrs(sum(C[p,t] for t in range(1 + n*7, 7 + n*7)) <= 2  for p in P_ 
+                                                                      for n in range(0, int(T/7) - 1))
 
 #R15
 model.addConstrs(c[p,t,e] >= 0  for t in T_ 
@@ -162,6 +163,17 @@ model.optimize()
 #### Imprimir resultados
 print(minc[1], maxc[1],exp[1])
 print(model.ObjVal)
+
+with open('resultados.csv', 'w') as resultados:
+    archivo_escribirle = csv.writer(resultados)
+
+    primera_fila = 'dia','demanda','dias_vence','inventario','comprados'
+    archivo_escribirle.writerow(primera_fila)
+
+    for t in T_:
+        for e in E_:
+            fila = f'{t}',f'{d[1,t]}',f'{e}',f'{round(i[1,t,e].x)}',f'{round(c[1,t,exp[1]].x)}'
+            archivo_escribirle.writerow(fila)
 
 
 for t in T_:
