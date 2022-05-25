@@ -14,7 +14,7 @@ En este archivo jupyter se hará uso de la librería *pandas*(no necesita que se
 
 Cabe mencionar que se intentó utilizar datos de empresas reales, pero estas no estuvieron dispuestas a colaborar por temas de confidencialidad empresarial.
 
-Se simularán **1000 productos** para un espacio de **28 días**, lo que serían 4 semanas completas comenzando desde el lunes.
+Se simularán **100 productos** para un espacio de **28 días**, lo que serían 4 semanas completas comenzando desde el lunes.
 
 ## Parámetros
 
