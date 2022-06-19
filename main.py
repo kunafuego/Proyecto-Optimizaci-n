@@ -157,6 +157,8 @@ model.addConstrs(B[t] >= 0 for t in T_)
 
 model.setObjective(objetivo, GRB.MINIMIZE)
 
+model.setParam("TimeLimit", 30*60)
+
 model.optimize()
 
 
@@ -166,7 +168,7 @@ print(model.ObjVal)
 
 with open('resultados.csv', 'w') as resultados:
     archivo_escribirle = csv.writer(resultados)
-
+    resultados.write("Valor Objetivo Final = "+str(model.ObjVal)+"\n")
     primera_fila = 'dia','demanda','dias_vence','inventario','comprados'
     archivo_escribirle.writerow(primera_fila)
 
@@ -179,5 +181,6 @@ with open('resultados.csv', 'w') as resultados:
 for t in T_:
     print(f"La demanda por el producto el dia {t} es {d[1,t]}")
     for e in E_:
-        print(f"El inventario de 1 que vence en {e} dias el dia {t} es {i[1,t,e].x}")
+        if i[1,t,e].x != 0:
+            print(f"El inventario de 1 que vence en {e} dias el dia {t} es {i[1,t,e].x}")
     print(f"Se compraron {c[1,t,exp[1]].x}")

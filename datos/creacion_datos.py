@@ -29,6 +29,7 @@ Comenzaremos por crear un DataFrame que tenga una fila para cada par (p,t)
 
 import pandas
 import random
+random.seed(2)
 df_pt = pandas.DataFrame({"p": [x for x in range(1,101)]*28}).sort_values("p")
 df_pt.insert(1, "t", [x for x in range(1,29)]*100)
 
@@ -86,10 +87,10 @@ df_pt.insert(4, "b", costos_bodegaje)
 
 Este parametro indica la demanda del producto *p* en el día *t*. En este caso no asumiremos que la demanda semana a semana es igual, porque pueden haber sucesos como fiestas nacionales que hacen variar bruscamente la demanda por ciertos bienes.
 
-El valor de este parametro variará entre 50 y 100 unidades diarias. No existe restricción de variación.
+El valor de este parametro variará entre 5 y 10 unidades diarias. No existe restricción de variación.
 """
 
-df_pt.insert(5, "d", [random.randint(5,10) for x in range(2800)])
+df_pt.insert(5, "d", [random.randint(5,11) for x in range(2800)])
 
 """## Parámetros con sufijo <sub>p</sub>"""
 
@@ -117,10 +118,10 @@ df_p.insert(2, "maxc", [random.uniform(5,7.5) for _ in range(100)])
 
 Este parámetro indica la mínima cantidad de productos de *p* que se deben pedir en un pedido de *p*.
 
-Tomará un valor aleatorio entre 20 y 30 unidades.
+Tomará un valor aleatorio entre 15 y 20 unidades.
 """
 
-df_p.insert(3, "minc", [random.randint(20,30) for _ in range(100)])
+df_p.insert(3, "minc", [random.randint(18,24) for _ in range(100)])
 
 """### z<sub>p</sub>
 
@@ -139,10 +140,10 @@ df_p.insert(4, "z", precios_ventas)
 """### exp<sub>p</sub>
 
 Este parámetro cuántos días faltan para que venza un producto *p* después de haberlo comprado.
-Este tomará un valor entre 2 y 5 días.
+Este tomará un valor entre 3 y 5 días.
 """
 
-df_p.insert(5, "exp", [random.randint(4,10) for x in range(100)])
+df_p.insert(5, "exp", [random.randint(3,6) for x in range(100)])
 
 """### u<sub>p</sub>
 
@@ -189,4 +190,3 @@ maxc = {p: maxc for p,maxc in zip(df_p["p"], df_p["maxc"])}
 z = {p: z for p,z in zip(df_p["p"], df_p["z"])}
 exp = {p: exp for p,exp in zip(df_p["p"], df_p["exp"])}
 u = {p: u for p,u in zip(df_p["p"], df_p["u"])}
-
