@@ -118,7 +118,7 @@ df_p.insert(2, "maxc", [random.uniform(5,7.5) for _ in range(100)])
 
 Este parámetro indica la mínima cantidad de productos de *p* que se deben pedir en un pedido de *p*.
 
-Tomará un valor aleatorio entre 15 y 20 unidades.
+Tomará un valor aleatorio entre 18 y 23 unidades.
 """
 
 df_p.insert(3, "minc", [random.randint(18,24) for _ in range(100)])
@@ -173,10 +173,10 @@ V = {"A": random.randint(150,170), "C": random.randint(75,90), "R": random.randi
 
 """### PR
 
-Este parámetro indica el presupuesto inicial del supermercado, el cual será un valor entre $40.000.000 y $50.000.000.
+Este parámetro indica el presupuesto inicial del supermercado, el cual será un valor entre $10.000.000 y $15.000.000.
 """
 
-PR = random.randint(400000000, 500000000)
+PR = random.randint(10000000, 15000000)
 
 """## Pasar los DataFrames a diccionarios"""
 
@@ -190,3 +190,8 @@ maxc = {p: maxc for p,maxc in zip(df_p["p"], df_p["maxc"])}
 z = {p: z for p,z in zip(df_p["p"], df_p["z"])}
 exp = {p: exp for p,exp in zip(df_p["p"], df_p["exp"])}
 u = {p: u for p,u in zip(df_p["p"], df_p["u"])}
+
+demanda_total = 0
+for t in range(1, 28 + 1):
+    for p in range(1, 100 + 1):
+        demanda_total += d[p,t]

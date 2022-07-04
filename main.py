@@ -179,8 +179,10 @@ with open('resultados.csv', 'w') as resultados:
 
 
 for t in T_:
+    print(f"El presupuesto en este día es {B[t].x}")
     print(f"La demanda por el producto el dia {t} es {d[1,t]}")
     for e in E_:
         if i[1,t,e].x != 0:
             print(f"El inventario de 1 que vence en {e} dias el dia {t} es {i[1,t,e].x}")
     print(f"Se compraron {c[1,t,exp[1]].x}")
+
